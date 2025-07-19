@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Traslación y Reflexión de Figuras en el Plano Cartesiano</title>
+  <style>
+    body {
+      font-family: 'Arial Rounded MT Bold', sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 10px;
+    }
+    canvas {
+      border: 2px solid #00aaff;
+      background-color: #ffffff;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 15px;
+      background-color: #00cc99;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #009977;
+    }
+    #stepText {
+      margin: 10px auto;
+      padding: 15px;
+      max-width: 600px;
+      background-color: #e0f7fa;
+      border: 2px solid #00bcd4;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Traslación y Reflexión de Figuras en el Plano Cartesiano</h1>
+  <canvas id="canvas" width="500" height="500"></canvas>
+  <div>
+    <button onclick="nuevoProblema()">Nuevo problema</button>
+    <button onclick="siguientePaso()">Paso siguiente</button>
+    <button onclick="verProceso()">Ver proceso completo</button>
+  </div>
+  <div id="stepText">Haz clic en "Nuevo problema" para comenzar.</div>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    let paso = 0;
+    let figuraOriginal = [[2, 2], [4, 2], [3, 4]];
+    let figuraTrasladada = [];
+    let figuraReflejada = [];
+    let dx = 0, dy = 0;
+    let mostrarTraslacion = false;
+    let mostrarReflexion = false;
+
+    function dibujarPlano() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = "#cccccc";
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= 500; x += 25) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, 500);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= 500; y += 25) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(500, y);
+        ctx.stroke();
+      }
+      // Ejes
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(250, 0);
+      ctx.lineTo(250, 500);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, 250);
+      ctx.lineTo(500, 250);
+      ctx.stroke();
+    }
+
+    function transformarCoordenada(x, y) {
+      return [x * 25 + 250, 250 - y * 25];
+    }
+
+    function dibujarFigura(puntos, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      const [x0, y0] = transformarCoordenada(...puntos[0]);
+      ctx.moveTo(x0, y0);
+      for (let i = 1; i < puntos.length; i++) {
+        const [x, y] = transformarCoordenada(...puntos[i]);
+        ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function nuevoProblema() {
+      paso = 0;
+      dx = Math.floor(Math.random() * 5 + 1);
+      dy = Math.floor(Math.random() * 5 + 1);
+      figuraOriginal = [[2, 2], [4, 2], [3, 4]];
+      figuraTrasladada = figuraOriginal.map(p => [p[0] + dx, p[1] + dy]);
+      figuraReflejada = figuraTrasladada.map(p => [-p[0], p[1]]);
+      mostrarTraslacion = false;
+      mostrarReflexion = false;
+      actualizarVista("Se generó un nuevo problema. Paso 1: Traslación");
+      dibujar();
+    }
+
+    function siguientePaso() {
+      if (paso === 0) {
+        mostrarTraslacion = true;
+        actualizarVista(`Paso 2: Aplicamos traslación. Δx = ${dx}, Δy = ${dy}`);
+        paso++;
+      } else if (paso === 1) {
+        mostrarReflexion = true;
+        actualizarVista("Paso 3: Reflejamos la figura trasladada respecto al eje Y.");
+        paso++;
+      } else {
+        actualizarVista("Paso finalizado. ¡Buen trabajo!");
+      }
+      dibujar();
+    }
+
+    function verProceso() {
+      mostrarTraslacion = true;
+      mostrarReflexion = true;
+      actualizarVista("Mostrando todo el proceso: Traslación y Reflexión completa.");
+      dibujar();
+    }
+
+    function actualizarVista(texto) {
+      document.getElementById("stepText").innerText = texto;
+    }
+
+    function dibujar() {
+      dibujarPlano();
+      dibujarFigura(figuraOriginal, "#00aaff"); // Original
+      if (mostrarTraslacion) {
+        dibujarFigura(figuraTrasladada, "#ffcc00"); // Trasladada
+      }
+      if (mostrarReflexion) {
+        dibujarFigura(figuraReflejada, "#66bb6a"); // Reflejada
+      }
+    }
+
+    dibujar();
+  </script>
+</body>
+</html>
